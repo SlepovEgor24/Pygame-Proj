@@ -15,9 +15,11 @@ pygame.font.init()
 path = pygame.font.match_font("arial")
 Font = pygame.font.Font(path, 25)
 BONFIREEVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(BONFIREEVENT, difficult[1] * 1500)
+pygame.time.set_timer(BONFIREEVENT, difficult[1] * 15 * 10 * 10 * 2)
 TEMPEVENT = pygame.USEREVENT + 2
 pygame.time.set_timer(TEMPEVENT, difficult[1] * 25)
+MOBEVENT = pygame.USEREVENT + 3
+pygame.time.set_timer(MOBEVENT, difficult[1] * 25 * 10 * 10 * 4)
 
 
 def load_image(name, puth, colorkey=None): ##Загрузка изображений
@@ -34,6 +36,65 @@ def load_image(name, puth, colorkey=None): ##Загрузка изображен
     else:
         image = image.convert_alpha()
     return image
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.x, self.y = x, y
+        self.k = 0
+        self.columns = columns
+        self.rows = rows
+        self.run = [True, True, True, True]
+        self.update()
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self, *args):
+        self.rect.x = self.x - player.x + 580
+        self.rect.y = self.y - player.y + 310
+        self.k += 1
+        if self.k == 12 and True in self.run:
+            self.cur_frame = (self.cur_frame + 1) % self.rows + self.run.index(True) * self.columns
+            self.image = self.frames[self.cur_frame]
+            self.k = 0
+        if self.x - player.x < 0:
+            self.vx = 199
+            self.run[2] = True
+            self.run[1] = False
+        elif self.x - player.x > 0:
+            self.vx = -199
+            self.run[2] = False
+            self.run[1] = True
+        else:
+            self.vx = 0
+            self.run[2] = False
+            self.run[1] = False
+        if self.y - player.y < 0:
+            self.vy = 199
+            self.run[0] = True
+            self.run[3] = False
+        elif self.y - player.y > 0:
+            self.vy = -199
+            self.run[0] = False
+            self.run[3] = True
+        else:
+            self.vy = 0
+            self.run[0] = False
+            self.run[3] = False
+        self.x += self.vx // FPS
+        self.y += self.vy // FPS
 
 
 class Map:
@@ -143,6 +204,11 @@ class Player(pygame.sprite.Sprite): ##Класс игрока
                 self.image = Player.image_w0
             else:
                 self.image = Player.image_w2
+        if args and args[0].type == pygame.KEYDOWN and args[0].key == 1073742049:
+            if self.wood:
+                self.wood = False
+                self.image = Player.image_e0
+                Wood(self.x + 50, self.y + 650, all_sprites)
         sprites = list()
         for sprite in all_sprites:
             if sprite != self and abs(sprite.x - player.x) < 1280 and abs(sprite.y - player.y) < 720:
@@ -231,11 +297,12 @@ class Wood(pygame.sprite.Sprite):    ##класс блока - елки
         self.mask = pygame.mask.from_surface(self.image)
         w, h = self.rect.w, self.rect.h
         self.x, self.y = x, y
+        self.update()
 
     def update(self, *args):
         self.rect.x = self.x - player.x + 300 * pixsel
         self.rect.y = self.y - player.y - 200 * pixsel
-        if pygame.sprite.collide_mask(self, player):
+        if pygame.sprite.collide_mask(self, player) and not player.wood:
             player.wood = True
             player.image = Player.image_e1
             all_sprites.remove(self)
@@ -442,6 +509,14 @@ if __name__ == '__main__':
                 all_sprites.update(event)
             if event.type == BONFIREEVENT or event.type == TEMPEVENT:
                 all_sprites.update(event)
+            if event.type == MOBEVENT:
+                if random.randint(0, 2) == 1:
+                    while True:
+                        x = random.randrange(player.x - 1280, player.x + 1280)
+                        y = random.randrange(player.y - 720, player.y + 720)
+                        if x > player.x + 690 or x < player.x - 690 or y > player.y + 360 or y < player.y - 360:
+                            break
+                    AnimatedSprite(load_image("Boar_Move.png", "\\sprites\\vragi_6\\Monster Pack 21 (Bovine)\\Spritesheets\\Updated Boar"), 6, 4, x, y)
         screen.fill((0, 0, 0))
         clock.tick(FPS)
         wall.draw(screen)
