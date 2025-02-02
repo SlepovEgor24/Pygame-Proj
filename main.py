@@ -548,7 +548,7 @@ def level(difficult, music):
             if (args and args[0].type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(
                     args[0].pos) and player.wood
                     and abs(self.rect.x - 320 * pixsel) < 60 * pixsel and
-                    abs(self.rect.y - 200 * pixsel) < 60 * pixsel and self.run < 5):
+                    abs(self.rect.y - 200 * pixsel) < 60 * pixsel and self.run < 5 and self.run != 0):
                 player.wood = False
                 player.image = Player.image_e0
                 self.run = min(self.run + 1, 5)
