@@ -13,7 +13,7 @@ FONT = 'files\\EpilepsySans.ttf'
 FONT_SIZE = 44
 
 
-class Buttons:
+class Buttons:  # Класс для создания кнопок
     def __init__(self, x, y, width, height, img, text, img_true=None, sound=None):
         self.x = x
         self.y = y
@@ -33,7 +33,7 @@ class Buttons:
         self.cursor_on_button = False
         self.mask = pygame.mask.from_surface(self.img)
 
-    def draw(self, screen):
+    def draw(self, screen):  # Отрисовка кнопки на экране
         if self.cursor_on_button:
             current_img = self.img_true
         else:
@@ -44,7 +44,7 @@ class Buttons:
         text_rect = text.get_rect(center=self.rect.center)
         screen.blit(text, text_rect)
 
-    def check_cursor(self, mouse_pos):
+    def check_cursor(self, mouse_pos):  # Проверка, находится ли курсор на кнопке
         x = mouse_pos[0] - self.rect.left
         y = mouse_pos[1] - self.rect.top
         if 0 <= x < self.rect.width and 0 <= y < self.rect.height:
@@ -52,7 +52,7 @@ class Buttons:
         else:
             self.cursor_on_button = False
 
-    def mouse_event(self, event):
+    def mouse_event(self, event):  # Обработка событий мыши для кнопки
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.check_cursor(pygame.mouse.get_pos())
             if self.cursor_on_button:
@@ -61,7 +61,7 @@ class Buttons:
                 pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
 
 
-class Slider:
+class Slider:  # Класс для создания слайдера
     def __init__(self, x, y, length, min_value, max_value, value, img, sound_object=None):
         self.x = x
         self.y = y
@@ -76,7 +76,7 @@ class Slider:
         self.slider = pygame.transform.scale(self.slider, (30, 30))
         self.sound_object = sound_object
 
-    def draw(self, screen):
+    def draw(self, screen):  # Отрисовка слайдера на экране
         pygame.draw.line(screen, (255, 255, 255), (self.x + 50, self.y + 25),
                          (self.x + self.length + 50, self.y + 25), 5)
         position = self.x + 50 + (self.value - self.min_value) / (
@@ -85,13 +85,13 @@ class Slider:
                                   self.y + 25 - self.slider.get_height() // 2))
         screen.blit(self.img_sound, (self.x - 30, self.y))
 
-    def check_cursor(self, mouse_pos):
+    def check_cursor(self, mouse_pos):  # Проверка, находится ли курсор на слайдере
         position = self.x + 50 + (self.value - self.min_value) / (
                 self.max_value - self.min_value) * self.length
         rect = self.slider.get_rect(center=(int(position), self.y + 25))
         return rect.collidepoint(mouse_pos)
 
-    def mouse_event(self, event):
+    def mouse_event(self, event):  # Обработка событий мыши
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.check_cursor(event.pos):
                 self.slider_moving = True
@@ -115,7 +115,7 @@ TEMPEVENT = pygame.USEREVENT + 2
 MOBEVENT = pygame.USEREVENT + 3
 
 
-def level(difficult, music):
+def level(difficult, music):  # Функция для запуска уровня
     global BONFIREEVENT, TEMPEVENT, MOBEVENT
     pygame.time.set_timer(BONFIREEVENT, difficult[0] * 15 * 10 * 10 * 2)
     pygame.time.set_timer(TEMPEVENT, difficult[0] * 25)
@@ -124,7 +124,7 @@ def level(difficult, music):
     wall = pygame.sprite.Group()
     list_with_objects = []
 
-    class AnimatedSprite(pygame.sprite.Sprite):
+    class AnimatedSprite(pygame.sprite.Sprite):  # Класс для анимированных спрайтов
         def __init__(self, sheet, columns, rows, x, y):
             super().__init__(all_sprites)
             self.frames = []
@@ -139,7 +139,7 @@ def level(difficult, music):
             self.hp = 4
             self.update()
 
-        def cut_sheet(self, sheet, columns, rows):
+        def cut_sheet(self, sheet, columns, rows):  # Разделение на кадры
             self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                     sheet.get_height() // rows)
             for j in range(rows):
@@ -148,7 +148,7 @@ def level(difficult, music):
                     self.frames.append(sheet.subsurface(pygame.Rect(
                         frame_location, self.rect.size)))
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния спрайта
             self.rect.x = self.x - player.x + 580
             self.rect.y = self.y - player.y + 310
             self.k += 1
@@ -197,12 +197,12 @@ def level(difficult, music):
                 all_sprites.remove(self)
                 del self
 
-    class Map:
+    class Map:  # Класс карты
         def __init__(self):
             self.x = 10000
             self.y = 10000
 
-    class Snow(pygame.sprite.Sprite):
+    class Snow(pygame.sprite.Sprite):  # Класс снега
         image = load_image("snow.png", "\\world\\map")
 
         def __init__(self, x, y, *group):
@@ -215,7 +215,7 @@ def level(difficult, music):
             self.rect.x = 0
             self.rect.y = 0
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление положения снега
             self.rect.x = self.x - player.x % 690
             self.rect.y = self.y - player.y % 360
 
@@ -261,10 +261,10 @@ def level(difficult, music):
             self.temp = 50
             self.counter = 1
 
-        def reset_movement(self):
+        def reset_movement(self):  # Сброс движения игрока
             self.run = [0, 0, 0, 0]
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния игрока
             global TEMPEVENT
             if args and args[0].type == pygame.KEYUP and pygame.key.name(args[0].key) == 'w':
                 self.run[0] = 0
@@ -358,7 +358,7 @@ def level(difficult, music):
                     else:
                         self.temp = max(self.temp - 1.25, 0)
 
-    class ChristmasTree(pygame.sprite.Sprite):  # класс блока - елки
+    class ChristmasTree(pygame.sprite.Sprite):  # Класс елки
         image = load_image("tree.png", "\\world\\blocks\\tree")
         image2 = load_image("stump.png", "\\world\\blocks\\tree")
 
@@ -373,14 +373,16 @@ def level(difficult, music):
             while True:
                 x = random.randrange(int(-0.7 * map.x), int(0.7 * map.x))
                 y = random.randrange(int(-0.7 * map.y), int(0.7 * map.y))
-                if x < -500 or x > 500 or y < -500 or y > 500 + self.rect.h and not dist_between_objects(
-                        x, y, objects, 30):
+                if (
+                        x < -500 or x > 500 or y < -500 or y > 500 + self.rect.h) and not dist_between_objects(
+                    x, y, objects, 30, (player.x, player.y)) and (
+                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
                     self.x = x
                     self.y = y
                     break
             self.chopped = False
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния елки
             self.rect.x = self.x - player.x + 300 * pixsel
             self.rect.y = self.y - player.y - 200 * pixsel
             if (args and args[0].type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(
@@ -398,7 +400,7 @@ def level(difficult, music):
                 self.mask = pygame.mask.from_surface(self.image)
                 Wood(self.x + self.rect.w // 2, self.y + self.rect.h // 2, all_sprites)
 
-    class Wood(pygame.sprite.Sprite):  # класс блока - елки
+    class Wood(pygame.sprite.Sprite):  # Класс бревна
         image = load_image("wood.png", "\\world\\blocks\\tree")
 
         def __init__(self, x, y, *group):
@@ -411,7 +413,7 @@ def level(difficult, music):
             self.x, self.y = x, y
             self.update()
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния бревна
             self.rect.x = self.x - player.x + 300 * pixsel
             self.rect.y = self.y - player.y - 200 * pixsel
             if pygame.sprite.collide_mask(self, player) and not player.wood:
@@ -420,7 +422,7 @@ def level(difficult, music):
                 all_sprites.remove(self)
                 del self
 
-    class Axe(pygame.sprite.Sprite):  # класс блока - топора
+    class Axe(pygame.sprite.Sprite):  # Класс топора
         image = load_image("axe.png", "\\world\\blocks")
 
         def __init__(self, *group):
@@ -433,7 +435,7 @@ def level(difficult, music):
             self.x = random.randint(200, 300)
             self.y = random.randint(200, 300)
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния топора
             self.rect.x = self.x - player.x + 690
             self.rect.y = self.y - player.y + 360
             if pygame.sprite.collide_mask(self, player):
@@ -442,7 +444,7 @@ def level(difficult, music):
                 all_sprites.remove(self)
                 del self
 
-    class Ruins(pygame.sprite.Sprite):
+    class Ruins(pygame.sprite.Sprite):  # Класс руин
         image2 = load_image("2.png", "\\sprites\\okr1\\2 Objects\\Ruins")
         image3 = load_image("3.png", "\\sprites\\okr1\\2 Objects\\Ruins")
         image4 = load_image("4.png", "\\sprites\\okr1\\2 Objects\\Ruins")
@@ -466,17 +468,19 @@ def level(difficult, music):
             while True:
                 x = random.randrange(int(-map.x), int(map.x))
                 y = random.randrange(int(-map.y), int(map.y))
-                if x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h and not dist_between_objects(
-                        x, y, objects, 30):
+                if (
+                        x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h) and not dist_between_objects(
+                    x, y, objects, 30, (player.x, player.y)) and (
+                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
                     self.x = x
                     self.y = y
                     break
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния руин
             self.rect.x = self.x - player.x + 690
             self.rect.y = self.y - player.y + 360
 
-    class Rocks(pygame.sprite.Sprite):
+    class Rocks(pygame.sprite.Sprite):  # Класс камней
         image6 = load_image("6.png", "\\sprites\\okruzhenie_9\\2 Objects\\Rocks")
         image1 = load_image("1.png", "\\sprites\\okruzhenie_9\\2 Objects\\Rocks")
         image2 = load_image("2.png", "\\sprites\\okruzhenie_9\\2 Objects\\Rocks")
@@ -506,17 +510,19 @@ def level(difficult, music):
             while True:
                 x = random.randrange(int(-map.x), int(map.x))
                 y = random.randrange(int(-map.y), int(map.y))
-                if x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h and not dist_between_objects(
-                        x, y, objects, 30):
+                if (
+                        x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h) and not dist_between_objects(
+                    x, y, objects, 30, (player.x, player.y)) and (
+                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
                     self.x = x
                     self.y = y
                     break
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния камней
             self.rect.x = self.x - player.x + 300 * pixsel
             self.rect.y = self.y - player.y - 200 * pixsel
 
-    class Bonfire(pygame.sprite.Sprite):
+    class Bonfire(pygame.sprite.Sprite):  # Класс костра
         image_0 = load_image("bonfire0.png", "\\world\\blocks\\bonfire")
         image_0 = pygame.transform.scale(image_0, (30 * pixsel, 30 * pixsel))
         image_1 = load_image("bonfire1.png", "\\world\\blocks\\bonfire")
@@ -540,7 +546,7 @@ def level(difficult, music):
             self.x, self.y = 0, 400 * 2
             self.counter = 1
 
-        def update(self, *args):
+        def update(self, *args):  # Обновление состояния костра
             global BONFIREEVENT, TEMPEVENT
             self.rect.x = self.x - player.x + 300 * pixsel
             self.rect.y = self.y - player.y - 200 * pixsel
@@ -659,8 +665,10 @@ def level(difficult, music):
         pygame.draw.rect(screen, (0, 0, 0), (0, 0, 80, 50), 5)
         pygame.draw.rect(screen, (255, 255, 0), (80, 0, 90, 50), 0)
         pygame.draw.rect(screen, (0, 0, 0), (80, 0, 90, 50), 5)
+        health_text = f'{int(player.hp):<9}'
+        temp_text = f'{int(player.temp):<9}'
         text_surface = pygame.font.Font(FONT, 25).render(
-            f' {int(player.hp)}       {int(player.temp)}', True, (0, 0, 0))
+            f'{health_text}   {temp_text}', True, (0, 0, 0))
         screen.blit(text_surface, (10, 10))
         time += 1
 
@@ -670,7 +678,7 @@ def level(difficult, music):
         formatted_time = f'{minutes}:{seconds:02}'
         pygame.display.set_caption(f'Продержался {formatted_time}')
 
-        if pygame.mouse.get_focused():
+        if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
             x, y = pygame.mouse.get_pos()
             screen.blit(cursor, (x - 2, y - 2))
 
@@ -683,10 +691,9 @@ def level(difficult, music):
             return 3
 
 
-class LevelWindow:
-    def __init__(self, screen, main_background, cursor, music, difficulty):
+class LevelWindow:  # Класс окна уровня игры
+    def __init__(self, screen, cursor, music, difficulty):
         self.screen = screen
-        self.main_background = load_image(main_background, '\\main')
         self.cursor = cursor
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
         self.music = music
@@ -704,7 +711,7 @@ class LevelWindow:
         self.music.play(-1)
         pygame.mixer.music.pause()
 
-    def run(self):
+    def run(self):  # Запускает уровня и обработка его завершения
         level_passed = level([self.difficulty], self.music)
         pygame.display.set_caption(f'Продержись!')
         if level_passed == 3:
@@ -733,12 +740,12 @@ class LevelWindow:
                 Transition(self.screen, WINDOW_WIDTH, WINDOW_HEIGHT, MAX_FPS).transition()
                 return
         self.music.stop()
-        if pygame.mouse.get_focused():
+        if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
             x, y = pygame.mouse.get_pos()
             self.screen.blit(self.cursor, (x - 2, y - 2))
         pygame.display.flip()
 
-    def unlock_next_level(self):
+    def unlock_next_level(self):  # Разблокировка следующего уровеня
         level_status = load_level_status()
         current_level_index = 5 - self.difficulty
         if current_level_index < len(level_status) - 1:
@@ -746,7 +753,7 @@ class LevelWindow:
             save_level_status(level_status)
 
 
-class WinLoseWindow:
+class WinLoseWindow:  # Класс  окна победы или поражения
     def __init__(self, screen, main_background, cursor, music, difficulty, value):
         self.screen = screen
         self.main_background = load_image(main_background, '\\main')
@@ -761,7 +768,7 @@ class WinLoseWindow:
                                       'button_true.png', 'close2.mp3')
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
 
-    def run(self):
+    def run(self):  # Запуск окна победы или поражения
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -803,13 +810,13 @@ class WinLoseWindow:
             self.restart_button.check_cursor(pygame.mouse.get_pos())
             self.restart_button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class PauseWindow:
+class PauseWindow:  # Класс  окна паузы
     def __init__(self, screen, main_background, cursor, music, player):
         self.screen = screen
         self.main_background = load_image(main_background, '\\main')
@@ -824,7 +831,7 @@ class PauseWindow:
         self.value_slider = Slider(WINDOW_WIDTH / 2 - 120, 200, 200, 0, 100,
                                    self.music.get_volume() * 100, 'sound2.png', self.music)
 
-    def run(self):
+    def run(self):  # Запуск окна паузы
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -863,13 +870,13 @@ class PauseWindow:
             self.back_button.draw(self.screen)
             self.value_slider.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class SettingsMenu:
+class SettingsMenu:  # Класс  меню настроек
     def __init__(self, screen, main_background, cursor):
         self.screen = screen
         self.main_background = main_background
@@ -889,7 +896,7 @@ class SettingsMenu:
                                    'back_true.png', 'close2.mp3')
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
 
-    def run(self):
+    def run(self):  # Запуск меню настроек
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -937,13 +944,13 @@ class SettingsMenu:
             self.back_button.check_cursor(pygame.mouse.get_pos())
             self.back_button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class ManualWindow:
+class ManualWindow:  # Класс окна инструкции по игре
     def __init__(self, screen, main_background, cursor):
         self.screen = screen
         self.main_background = load_image(main_background, '\\main')
@@ -952,7 +959,7 @@ class ManualWindow:
                                    'back_true.png', 'close2.mp3')
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
 
-    def run(self):
+    def run(self):  # Запуск окна с инструкцией
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -990,13 +997,13 @@ class ManualWindow:
             self.back_button.check_cursor(pygame.mouse.get_pos())
             self.back_button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class DescriptionWindow:
+class DescriptionWindow:  # Класс окна описания игры
     def __init__(self, screen, main_background, cursor):
         self.screen = screen
         self.main_background = load_image(main_background, '\\main')
@@ -1005,7 +1012,7 @@ class DescriptionWindow:
                                    'back_true.png', 'close2.mp3')
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
 
-    def run(self):
+    def run(self):  # Запуск окна с описанием игры
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -1043,13 +1050,13 @@ class DescriptionWindow:
             self.back_button.check_cursor(pygame.mouse.get_pos())
             self.back_button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class DeleteProgressWindow:
+class DeleteProgressWindow:  # Класс окна подтверждения удаления прогресса
     def __init__(self, screen, cursor, settings_menu):
         self.screen = screen
         self.cursor = cursor
@@ -1061,7 +1068,7 @@ class DeleteProgressWindow:
                                       'button_true.png', 'close2.mp3')
         self.close_sound = pygame.mixer.Sound(load_sounds('close2.mp3'))
 
-    def run(self):
+    def run(self):  # Запуск окна подтверждения удаления прогресса
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -1102,13 +1109,13 @@ class DeleteProgressWindow:
             self.confirm_button.check_cursor(pygame.mouse.get_pos())
             self.confirm_button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(self.cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class Play:
+class Play:  # Класс игрового процесса и выбор уровня
     def __init__(self, screen, main_background, cursor):
         self.screen = screen
         self.main_background = load_image(main_background, '\\main')
@@ -1124,7 +1131,7 @@ class Play:
         )
         self.create_buttons()
 
-    def create_buttons(self):
+    def create_buttons(self):  # Создание кнопки для выбора уровня
         button_width = 200
         button_height = 80
         total_height = 5 * button_height + 4 * 20
@@ -1149,7 +1156,7 @@ class Play:
                 )
             self.buttons.append(button)
 
-    def run(self):
+    def run(self):  # Запуск окна выбора уровня
         running = True
         while running:
             self.screen.fill((0, 0, 0))
@@ -1186,7 +1193,7 @@ class Play:
                                 difficulty = 6 - (5 - level_index)
                                 Transition(self.screen, WINDOW_WIDTH, WINDOW_HEIGHT,
                                            MAX_FPS).transition()
-                                LevelWindow(self.screen, 'les.jpg', self.cursor,
+                                LevelWindow(self.screen, self.cursor,
                                             pygame.mixer.Sound(load_sounds('fight.mp3')),
                                             difficulty).run()
                                 return
@@ -1200,20 +1207,20 @@ class Play:
                 button.check_cursor(pygame.mouse.get_pos())
                 button.draw(self.screen)
 
-            if pygame.mouse.get_focused():
+            if pygame.mouse.get_focused():  # Проверяем, активен ли курсор мыши в окне игры
                 x, y = pygame.mouse.get_pos()
                 self.screen.blit(cursor, (x - 2, y - 2))
             pygame.display.flip()
 
 
-class Transition:
+class Transition:  # Класс отвечает за переходы между экранами
     def __init__(self, screen, width, height, max_fps):
         self.screen = screen
         self.width = width
         self.height = height
         self.max_fps = max_fps
 
-    def transition(self):
+    def transition(self):  # Выполнение анимации перехода
         running = True
         level_transparency = 0
         while running:
@@ -1232,15 +1239,19 @@ class Transition:
             clock.tick(self.max_fps)
 
 
-def dist_between_objects(x, y, objects, min_distance):
-    for el in objects:
-        distance = ((x - el.x) ** 2 + (y - el.y) ** 2) ** 0.5
-        if distance < min_distance:
-            return True
-    return False
+# Проверка расстояния между объектом и другими уже созданными и игроком
+def dist_between_objects(x, y, objects, min_distance, player_pos=None):
+    if player_pos:
+        distance_to_player = ((x - player_pos[0]) ** 2 + (y - player_pos[1]) ** 2) ** 0.5
+        if distance_to_player < min_distance:
+            for el in objects:
+                distance = ((x - el.x) ** 2 + (y - el.y) ** 2) ** 0.5
+                if distance < min_distance:
+                    return True
+            return False
 
 
-def load_image(name, puth, colorkey=None):
+def load_image(name, puth, colorkey=None):  # Загрузка изображения из файла
     fullname = os.path.join(f'files{puth}', name)
     if not os.path.isfile(fullname):
         print(f'Файл с изображение "{fullname}" отсутствует')
@@ -1256,7 +1267,7 @@ def load_image(name, puth, colorkey=None):
     return image
 
 
-def load_sounds(name):
+def load_sounds(name):  # Загрузка звука из файла
     fullname = os.path.join('files', 'sounds', name)
     if not os.path.isfile(fullname):
         print(f'Файл со звуком "{fullname}" отсутствует')
@@ -1264,12 +1275,12 @@ def load_sounds(name):
     return fullname
 
 
-def save_volume(volume_file, volume):
+def save_volume(volume_file, volume):  # Сохранение уровня громкости в файл
     with open(volume_file, 'w') as file:
         file.write(str(volume))
 
 
-def load_volume(volume_file):
+def load_volume(volume_file):  # Загрузка уровня громкости из файла
     try:
         with open(volume_file, 'r') as file:
             return float(file.read())
@@ -1277,13 +1288,13 @@ def load_volume(volume_file):
         return 0.5
 
 
-def save_level_status(status):
+def save_level_status(status):  # Сохранение статуса уровней в файл
     with open(LEVEL_STATUS, 'w') as file:
         for s in status:
             file.write(f'{int(s)}\n')
 
 
-def load_level_status():
+def load_level_status():  # Загрузка статуса уровней из файла
     try:
         with open(LEVEL_STATUS, 'r') as file:
             return [bool(int(line.strip())) for line in file]
@@ -1312,7 +1323,7 @@ except FileNotFoundError:
     pygame.mixer.music.set_volume(volume)
 
 
-def main():
+def main():  # Запуск игры
     exit_button = Buttons(WINDOW_WIDTH / 2 - 97.5, 550, 195, 70, 'exit.png', '',
                           'exit_true2.png',
                           'close2.mp3')
