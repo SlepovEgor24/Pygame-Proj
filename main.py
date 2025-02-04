@@ -370,16 +370,18 @@ def level(difficult, music):  # Функция для запуска уровн�
             self.rect = self.image.get_rect()
             self.mask = pygame.mask.from_surface(self.image)
             self.sound_broke_tree = pygame.mixer.Sound(load_sounds('hit.mp3'))
-            while True:
+            k = True
+            while k:
                 x = random.randrange(int(-0.7 * map.x), int(0.7 * map.x))
                 y = random.randrange(int(-0.7 * map.y), int(0.7 * map.y))
-                if (
-                        x < -500 or x > 500 or y < -500 or y > 500 + self.rect.h) and not dist_between_objects(
-                    x, y, objects, 30, (player.x, player.y)) and (
-                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
-                    self.x = x
-                    self.y = y
-                    break
+                if ((x - player.x + 100) ** 2 + (y - 450 - player.y) ** 2) ** 0.5 >= 520:
+                    for sprite in all_sprites:
+                        if sprite != self and abs(sprite.x - x) > 300 and abs(
+                                sprite.y - y) > 300:
+                            self.x = x
+                            self.y = y
+                            k = False
+                            break
             self.chopped = False
 
         def update(self, *args):  # Обновление состояния елки
@@ -468,10 +470,7 @@ def level(difficult, music):  # Функция для запуска уровн�
             while True:
                 x = random.randrange(int(-map.x), int(map.x))
                 y = random.randrange(int(-map.y), int(map.y))
-                if (
-                        x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h) and not dist_between_objects(
-                    x, y, objects, 30, (player.x, player.y)) and (
-                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
+                if ((x - player.x + 100) ** 2 + (y - 450 - player.y) ** 2) ** 0.5 >= 520:
                     self.x = x
                     self.y = y
                     break
@@ -510,10 +509,7 @@ def level(difficult, music):  # Функция для запуска уровн�
             while True:
                 x = random.randrange(int(-map.x), int(map.x))
                 y = random.randrange(int(-map.y), int(map.y))
-                if (
-                        x < -380 or x > 380 or y < -380 or y > 380 + self.rect.h) and not dist_between_objects(
-                    x, y, objects, 30, (player.x, player.y)) and (
-                        (x - player.x) ** 2 + (y - player.y) ** 2) ** 0.5 >= 120:
+                if ((x - player.x + 100) ** 2 + (y - 450 - player.y) ** 2) ** 0.5 >= 520:
                     self.x = x
                     self.y = y
                     break
