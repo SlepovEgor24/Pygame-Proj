@@ -374,7 +374,7 @@ def level(difficult, music):  # Функция для запуска уровн�
             while k:
                 x = random.randrange(int(-0.7 * map.x), int(0.7 * map.x))
                 y = random.randrange(int(-0.7 * map.y), int(0.7 * map.y))
-                if ((x - player.x + 100) ** 2 + (y - 450 - player.y) ** 2) ** 0.5 >= 520:
+                if ((x - player.x + 100) ** 2 + (y - 450 - player.y) ** 2) ** 0.5 >= 300:
                     for sprite in all_sprites:
                         if sprite != self and abs(sprite.x - x) > 300 and abs(
                                 sprite.y - y) > 300:
